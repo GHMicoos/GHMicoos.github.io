@@ -1,3 +1,12 @@
+---
+layout: post
+title:  "C# 对象序列化与反序列化"
+date:   2017-07-21 11:40:00
+categories: tool
+tags: C#基础知识
+author: "MiCoos"
+---
+
 # C# 对象序列化与反序列化 #
 
 ----------
