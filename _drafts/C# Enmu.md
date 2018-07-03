@@ -1,41 +1,41 @@
 ### 一.什么是枚举？  
- 枚举是一种值类型。枚举类型是包含一组已命名常量的独特值类型。  
+ 枚举是一种**值类型**。枚举类型是包含一组已命名常量的独特值类型。  
  eg：某种情况下，我们需要标识某任务的处理状态，其状态包括 待处理，正在处理，已处理。  
- 我们可以使用-1,0,1来标识 三个状态，但是我们可以定义为枚举，那样具有更好的可读性，
+ 我们可以使用,0,1,2来标识 三个状态，但是我们可以定义为枚举，那样具有更好的可读性，
  避免硬编码.
  ``` C#
- public enum TaskState:int
- {
-   WatieToDeal=-1,
-   Dealing=0,
-   Dealed=1,
- }
+    public enum TaskState : int
+    {
+        WatieToDeal = 0,
+        Dealing = 1,
+        Dealed = 2,
+    }
  ```  
  ### 二.如何定义枚举？  
  枚举使用一种整型值类型作为其基础存储(默认是int)， 并提供离散值的语义含义。  
  ``` C#
- public enum TaskState:int
- {
-   WatieToDeal=-1,
-   Dealing=0,
-   Dealed=1,
- }
+    public enum TaskState : int
+    {
+        WatieToDeal = 0,
+        Dealing = 1,
+        Dealed = 2,
+    }
  ```
 ### 三.枚举的特点与注意事项？
 1. 默认情况下，第一个枚举值0（从技术上说，是0显示转型为基础枚举类型），后续每一项递增1，  
 但是可以显示为枚举赋值。  
   ``` C#
-   public enum ConnectionState
-  {
-	  Disconnected,//值为 0
-	  Connecting=10,
-	  Connected,//值为 11
-	  Joined=Connected,//值为 11（将Connected引用的值赋值给Joined）
-	  Disconnecting//值为12
-  }
+    public enum ConnectionState
+    {
+        Disconnected,//值为 0
+        Connecting = 10,
+        Connected,//值为 11
+        Joined = Connected,//值为 11（将Connected引用的值赋值给Joined）
+        Disconnecting//值为12
+    }
   ```  
 注释：  
-* 值 0 可以隐式转换为 枚举变量。特别注意值0应该设置为枚举。  
+* 值 0 可以**隐式转换**为 枚举变量。特别注意值0应该设置为枚举。  
 * 如果创建的是值枚举而不是标志枚举，创建 None 枚举常量仍十分有用。  
 *（原因是在默认情况下，公共语言运行库会将用于枚举的内存初始化为零。  
 因此，如果不定义值为零的常量，则枚举在创建时将包含非法值。）*  
@@ -51,12 +51,12 @@
 	//... ...  
   }
   ```
-3. 并非只有有效的枚举值才可以转换成功。只要值能成功转型为基础类型，就会成功。  
-eg：完全可以将42转型为一个ConnectionState，即使当前没有定义对应的ConnectionState的枚举值。  
+3. 并非只有有效的枚举值才可以转换成功。**只要值能成功转型为基础类型，就会成功。**  
+eg：完全可以将42转型为一个`ConnectionState`，即使当前没有定义对应的`ConnectionState`的枚举值。  
   `ConnectionState state = (ConnectionState)42;`  
-  **优点：**在没有对应的枚举值得前提下也允许转型，优点在于枚举能在未来的API发布中添加新值，而且不会破坏早起版本。   
-  **缺点：**开发者在编码时必须谨慎，要主动考虑到位命名值得可能性。  
-注释：  
+  **优点**：在没有对应的枚举值得前提下也允许转型，优点在于枚举能在未来的API发布中添加新值，而且不会破坏早起版本。   
+  **缺点**：开发者在编码时必须谨慎，要主动考虑到位命名值得可能性。  
+**注释：**  
 * 为枚举变量赋值的时候，尽量使用枚举名称赋值；  
 如果用值类型变量强制转换赋值，需要考虑值类型变量可能未在枚举中定义名称的情况。  
 * 在定义采用枚举常量作为值的方法或属性时，应考虑对该值进行验证。  
@@ -82,15 +82,15 @@ eg：完全可以将42转型为一个ConnectionState，即使当前没有定义�
 //old
 public eumn ConnectionState
 {
-	Disconnected,//0
-	Connecting ,//1
+    Disconnected,//0
+    Connecting ,//1
 }
 //new
 public eumn ConnectionState
-{ 
-	Disconnected,//0
-	Connected,//1
-	Connecting ,//2 顺移了
+{
+    Disconnected,//0
+    Connected,//1
+    Connecting ,//2 顺移了
 }
 ```
 虽然允许在代码未来的版本中为一个枚举添加额外的值，但是这样做时候要注意，原来的值可能会顺移。  
@@ -99,16 +99,16 @@ public eumn ConnectionState
 //较好的方法 01
 public eumn ConnectionState
 { 
-	Disconnected,//0
-	Connecting ,//1 
-	Connected,//2 插入到枚举末尾
+    Disconnected,//0
+    Connecting ,//1 
+    Connected,//2 插入到枚举末尾
 }
 //较好的方法 02
 public eumn ConnectionState
 { 
-  Connected=2,//2 显示赋值后，不考虑 枚举间的位置
-	Disconnected=0,//0
-	Connecting=1 ,//1 
+    Connected=2,//2 显示赋值后，不考虑 枚举间的位置
+    Disconnected=0,//0
+    Connecting=1 ,//1 
 }
 ```
 ### 四 枚举的优势
@@ -184,7 +184,6 @@ select 1|2 as '|' ,(1|2)&1 as '&',(1|2)^(2|4) as '^' ,(1|2)&~(2|4) as '&~'
         User = Select | Download,//值为 1+2=3
         Admin = Select | Download | Update,//值为 1+2+8=11
         SystemAdmin = Admin | Delete,//值为 11+4=15
-
     }
 
     static void Main(string[] args)
@@ -227,7 +226,7 @@ select 1|2 as '|' ,(1|2)&1 as '&',(1|2)^(2|4) as '^' ,(1|2)&~(2|4) as '&~'
 枚举的值一般为int在数据库中占用空间比较小，枚举的变量用于给数据库中的字段赋值，
 那么如果要显示字段就需要考虑到Descripttion特性，显示特定名称	
 ``` C#
-[Flags]
+    [Flags]
     public enum MyPermission
     {
         [Description("无任何权限")]
