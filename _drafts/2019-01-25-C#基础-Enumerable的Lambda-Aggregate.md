@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "C#基础-Lambda"
+title:  "C#基础-Lambda-Aggregate"
 categories: C#基础
 tags: C#基础 Enumerable lambda  
 author: GHMicoos
@@ -13,14 +13,13 @@ author: GHMicoos
 
 
 
+**概述：统计部分包括以下几个方面，一般统计(Aggregate)、计数(Count,LongCount)、特殊统计(Sum、Average、Max、Min)。**
 
-### 一 统计
-#### **1.概述**
+### 一 计数(Count,LongCount)
+#### **1.计数的含义**
+* 该组方法返回序列“包含”的元素个数，其中“包含”可以是一般意义的包括，也可以是满足某个条件的后的元素个数。返回值类型可以是int/long。该组方法的四个重载形式如下：
 
 ``` js
-
-
-#region Aggregate(Aggregate未完成,Average,Count,LongCoung,Max,Min,Sum)
 
 /// <summary>
 /// 返回序列中元素的个数
@@ -39,7 +38,7 @@ int Count<TSource>(this IEnumerable<TSource> source);
 /// <param name="source">待处理序列</param>
 /// <param name="predicate">用于测试元素是否满足条件的函数</param>
 /// <returns>序列中满足条件的元素个数</returns>
-/// <exception cref="T:System.ArgumentNullException">source==null</exception>
+/// <exception cref="T:System.ArgumentNullException">source or predicate is null.</exception>
 /// <exception cref="T:System.OverflowException">序列中满足条件的元素个数比Int32.MaxValue还大</exception>
 int Count<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);
 
@@ -61,9 +60,84 @@ long LongCount<TSource>(this IEnumerable<TSource> source);
 /// <param name="source">待处理序列</param>
 /// <param name="predicate">用于测试元素是否满足条件的函数</param>
 /// <returns>序列中满足条件的元素个数</returns>
-/// <exception cref="T:System.ArgumentNullException">source==null</exception>
+/// <exception cref="T:System.ArgumentNullException">source or predicate is null.</exception>
 /// <exception cref="T:System.OverflowException">序列中满足条件的元素个数比Int32.MaxValue还大</exception>
 long LongCount<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);
+
+```
+
+* 简单计数：`int Count<TSource>(this IEnumerable<TSource> source);`和`long LongCount<TSource>(this IEnumerable<TSource> source);`。
+* 复杂计数： `int Count<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);`和`long LongCount<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);`。
+
+#### **2.简单计数**
+* 返回序列的元素个数，Sample如下。
+
+``` js
+public void  Aggregate_Count_Simple()
+{
+    var list = new List<int>() { 2, 4, 1, 5, 2, 1, 9, 55, 78 };
+    var nullList = default(List<int>);
+    //Int32.MaxValue 边界情况不好测试，一般不会用大那么大的序列。这里不测试
+    var greaterInt32List = Enumerable.Range(0, Int32.MaxValue);
+    var bbb = greaterInt32List.Append(100);
+    //var bbbCount = bbb.LongCount();
+
+    try
+    {
+        var nullCount = nullList.Count();
+    }
+    catch (ArgumentNullException e)
+    {
+        //会进入断点
+        Console.WriteLine(e.ToString());
+    }
+
+    //一般计数
+    var count = list.Count();
+}
+
+```
+
+#### **3.复杂计数**
+* 返回序列中满足predicate函数的元素个数，sample如下：
+
+``` js
+
+public void Arrageate_Count_Complex()
+{
+    var list = new List<string>() { "李相赫","姿态","司马老贼","厂长"};
+
+    //测试正常情况
+    //序列中元素的长度大于等于3的元素个数
+    var count=list.Count(x => x.Length >= 3);
+    //count=2
+    Console.WriteLine($"count={count}");
+
+    //测试predicate==null
+    try
+    {
+        var predicateCount=list.Count(null);
+    }
+    catch(Exception e)
+    {
+        //System.ArgumentNullException: Value cannot be null.
+        //Parameter name: predicate
+        Console.WriteLine(e.ToString());
+    }
+}
+
+```
+
+### 二 特殊统计(Sum、Average、Max、Min)
+#### **1.含义**
+* 该组方法返回序列（数字序列，int、long、decimal、float、double）中的特殊统计，包括Sun(求和)、Average(平均值)、Max(最大值)、Min(最小值)：
+
+
+
+``` js
+
+
+#region Aggregate(Aggregate未完成,Average,Count,LongCoung,Max,Min,Sum)
 
 /// <summary>
 /// 计算“数字”序列的平均值
