@@ -157,8 +157,9 @@ IEnumerable<TResult> OfType<TResult>(this IEnumerable source);
 
 ```
 
+### 二 特例转换(`ToArray`、`ToList`、`ToDictionary`、`ToLookup`)
 
-#### **4.ToArray、ToList**
+#### **1.ToArray、ToList**
 * 该方法的作用：从source 创建数组，从IEnumerable<TSource>创建List<Tsource>
 * 这两个方法比较简单，不在详细赘述。
 
@@ -186,7 +187,7 @@ List<TSource> ToList<TSource>(this IEnumerable<TSource> source);
 
 ```
 
-#### **5.ToDictionary**
+#### **2.ToDictionary**
 * 方法作用：通过`IEnumerable<TSource>`序列创建字典`Dictionary<TKey, TElement>`。
 
 * `Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector);` Sample:
@@ -377,7 +378,7 @@ Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this IEnumerabl
 ```
 
 
-#### **6.ToLookup**
+#### **3.ToLookup**
 * 方法作用：将集合转换为按键分组的查找。和Dictionary类似，只是Dictionary是一个Key对应一个Value;ILookup是一个Key，对应多个Vlaue。
 
 * `ILookup<TKey, TSource> ToLookup<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector);` 与 `ILookup<TKey, TSource> ToLookup<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer);`，Sample：
