@@ -2,7 +2,7 @@
 layout: post
 title:  "C#基础-Lambda-Aggregate"
 categories: C#基础
-tags: C#基础 Enumerable lambda  
+tags: Enumerable Lambda LinqToObject
 author: GHMicoos
 ---
 
@@ -470,7 +470,7 @@ TResult Min<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TR
 #### **1.含义**
 * 对集合中的每个元素执行指定的操作，同时将结果向前传送。如`TSource Aggregate<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource, TSource> func);`签名中，参数`func`中第一个`TSource`表示前面已处理元素产生的值，第二个`TSource`表示序列当前值，第三个`TSource`表示`func`返回结果，用于下一次调用的第一个参数。
 
-#### **2.代码**
+#### **2.Sample代码**
 * 下面是Sample：
 
 ``` js
