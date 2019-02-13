@@ -157,7 +157,7 @@ IEnumerable<TResult> OfType<TResult>(this IEnumerable source);
 
 ```
 
-### 二 特例转换(`ToArray`、`ToList`、`ToDictionary`、`ToLookup`)
+### 二 特例转换(ToArray,ToList,ToDictionary,ToLookup)
 
 #### **1.ToArray、ToList**
 * 该方法的作用：从source 创建数组，从IEnumerable<TSource>创建List<Tsource>
