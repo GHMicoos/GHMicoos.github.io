@@ -13,7 +13,7 @@ author: GHMicoos
 
 
 ### 概述
-**“元素”表示获取某个位置的元素，它包括`ElementAt`,`ElementAtOrDefault`,`First`,`FirstOrDefault`,`Last`,`LastOrDefault`,`Single`,`SingleOrDefault`。使用比较容易，看方法注释，不在赘述。**
+**“元素”表示获取某个位置的元素，它包括`ElementAt`,`ElementAtOrDefault`,`First`,`FirstOrDefault`,`Last`,`LastOrDefault`,`Single`,`SingleOrDefault`。使用容易，看方法注释，不在赘述。**
 
 ### 一 元素
 #### **1.方法签名**
