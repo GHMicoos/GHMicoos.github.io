@@ -9,11 +9,14 @@ author: GHMicoos
 * content
 {:toc}
 
-暂无
+包括：`Aggregate`,`Count`,`LongCount`,`Sum`,`Average`,`Max`,`Min`。
 
 
 
-**概述：统计部分包括以下几个方面，一般统计(Aggregate)、计数(Count,LongCount)、特殊统计(Sum、Average、Max、Min)。**
+
+
+### 零 概述
+**“统计部分”包括`Aggregate`,`Count`,`LongCount`,`Sum`,`Average`,`Max`,`Min`。以下几个方面阐述，一般统计(Aggregate)、计数(Count,LongCount)、特殊统计(Sum、Average、Max、Min)。**
 
 ### 一 计数(Count,LongCount)
 #### **1.计数的含义**

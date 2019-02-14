@@ -9,9 +9,14 @@ author: GHMicoos
 * content
 {:toc}
 
-暂无
+包括：`AsEnumerable`、`Cast`、`OfType`、`ToArray`、`ToList`、`ToDictionary`、`ToLookup`。
 
-### 概述
+
+
+
+
+
+### 零 概述
 **“转换部分”包括以下几个方面，`AsEnumerable`、`Cast`、`OfType`、`ToArray`、`ToList`、`ToDictionary`、`ToLookup`。下面分为两组来讨论,“一般转换”包括`AsEnumerable`、`Cast`、`OfType`；“特例转换”包括`ToArray`、`ToList`、`ToDictionary`、`ToLookup`。**
 
 ### 一 一般转换(AsEnumerable,Cast,OfType)
