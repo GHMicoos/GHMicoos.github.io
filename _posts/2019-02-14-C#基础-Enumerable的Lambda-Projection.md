@@ -17,7 +17,7 @@ author: GHMicoos
 
 
 ### 零 概述
-**“投影”包括`Select`,`SelectMany`。`Select`主要作用是讲序列中的每个元素投射到新表单中。`SelectMany`主要作用将source中的每个元素投射到IEnumerable<TResult>,将得到的序列压扁成一个序列。 将集合扁平化为单个集合(类似于SQL中的交叉连接)**
+**“投影”包括`Select`,`SelectMany`。`Select`主要作用是讲序列中的每个元素投射到新表单中。`SelectMany`主要作用将source中的每个元素投射到`IEnumerable<TResult>`,将得到的序列压扁成一个序列。 将集合扁平化为单个集合(类似于SQL中的交叉连接)**
 
 ### 一 投影(Select,SelectMany)
 #### **1.Select**
