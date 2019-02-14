@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "LinqToObject-Lambda-Generation"
+title:  "Lambda-Generation"
 categories: C#基础-LinqToObject
 tags: Enumerable Lambda LinqToObject
 author: GHMicoos

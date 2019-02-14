@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "LinqToObject-Lambda-Conversion"
+title:  "Lambda-Conversion"
 categories: C#基础-LinqToObject
 tags: Enumerable Lambda LinqToObject
 author: GHMicoos

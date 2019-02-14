@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "LinqToObject-Lambda-GroupBy"
+title:  "Lambda-GroupBy"
 categories: C#基础-LinqToObject
 tags: Enumerable Lambda LinqToObject
 author: GHMicoos
