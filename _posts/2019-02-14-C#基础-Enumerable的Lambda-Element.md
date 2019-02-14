@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "C#基础-Lambda-Element"
-categories: C#基础
+title:  "LinqToObject-Lambda-Element"
+categories: C#基础-LinqToObject
 tags: Enumerable Lambda LinqToObject
 author: GHMicoos
 ---
