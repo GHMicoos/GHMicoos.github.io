@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  ".Net Core-配置文件"
-categories: .NetCore
+categories: DotNetCore
 tags: .Net Core 配置文件
 author: GHMicoos
 ---
@@ -10,152 +10,315 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`Distinct`,`Except`,`Intersect`,`Union`。
+概述：.Net Core中应用配置是基于“配置提供程序”建立的键对值。“配置提供程序”从各种配置源读取键值对作为配置数据。各种配置源包括`Azure Key Value`,`命令行参数`,`自定义提供程序`,`Key-per-file配置`,`环境变量`,`内存中的.Net对象`,`配置文件(XML,Json,INI)`。本文这里暂时只讨论`配置文件`。
 
 
 
 
 
 
-### 零 概述
-**复元素。**
+
+### 一 配置文件(INI,XML,Json)
+
+#### **1.创建配置文件**
+* 以Josn为例子，其他文件一样的。
 
 ``` js
 
-public void Set_()
 {
-    var listOne = new List<int>() { 1, 1, 2, 2, 3, 3, 4, 4 };
-    var listTwo = new List<int>() { 3, 3, 4, 4, 5, 5, 6, 6 };
+  "Name": "Jerry",
+  "option1": "value1_from_json",
+  "option2": 2,
 
-    //1,2,3,4
-    var distinct = listOne.Distinct().ToList();
-
-    //1,2
-    var except = listOne.Except(listTwo).ToList();
-
-    //3,4
-    var intersect = listOne.Intersect(listTwo).ToList();
-
-    //1,2,3,4,5,6
-    var union = listOne.Union(listTwo).ToList();
+  "subsection": {
+    "suboption1": "subvalue1_from_json"
+  },
+  "wizards": [
+    {
+      "Name": "Gandalf",
+      "Age": "1000"
+    },
+    {
+      "Name": "Harry",
+      "Age": "17"
+    }
+  ],
+  "RedisConfig": [
+    {
+      "Connection": "127.0.0.1:6379,connectTimeout=3600",
+      "InstanceName": "Redis_Default",
+      "DefaultDatabase": 1,
+      "ExpiryTimeSpan": 30
+    }
+  ]
 }
 
 ```
 
-### 一 集合(Distinct,Except,Intersect,Union)
+#### **2.使用配置文件**
+* 需要在`ConfigurationBuilder`的实例上调用`AddJsonFile`(或`AddIniFile`,`AddXmlFile`)扩展方法。
+* 下面分为三个列子来展现在WebHostBuilder、和普通控制台程序使用配置文件。
+* 需要引入包`Microsoft.extensions.configuration` 和 `Microsoft.Extensions.Configuration.Json`(其他文件类型：`Microsoft.Extensions.Configuration.Xml`,`Microsoft.Extensions.Configuration.Ini`)
 
-#### **1.Distinct**
-* 通过默认的（或者特定的）“相等比较器”，从序列中返回唯一的元素组成的序列（从序列中去掉重复的元素）。
-* 方法签名：
 
 ``` js
+//配置主机时调用ConfigureAppConfiguration 来使用配置文件
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        CreateWebHostBuilder(args).Build().Run();
+    }
 
-/// <summary>
-/// 通过默认的“相等比较器”，从序列中返回唯一的元素组成的序列（从序列中去掉重复的元素）。
-/// </summary>
-/// <typeparam name="TSource">泛型类型参数</typeparam>
-/// <param name="source">待移除重复的序列</param>
-/// <returns>从序列中返回唯一的元素组成的序列</returns>
-/// <exception cref="T:System.ArgumentNullException">source==null</exception>
-IEnumerable<TSource> Distinct<TSource>(this IEnumerable<TSource> source);
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+        WebHost.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("config.json", optional: true, reloadOnChange: true);
+            })
+            .UseStartup<Startup>();
+}
+////后续可以通过依赖注入 使用IConfiguration
+```
 
-/// <summary>
-/// 通过特定的“相等比较器”，从序列中返回唯一的元素组成的序列（从序列中去掉重复的元素）。
-/// </summary>
-/// <typeparam name="TSource">泛型类型参数</typeparam>
-/// <param name="source">待移除重复的序列</param>
-/// <param name="comparer">特定的“相等比较器”</param>
-/// <returns>从序列中返回唯一的元素组成的序列（从序列中去掉重复的元素）。</returns>
-/// <exception cref="T:System.ArgumentNullException">source==null</exception>
-IEnumerable<TSource> Distinct<TSource>(this IEnumerable<TSource> source, IEqualityComparer<TSource> comparer);
+``` js
+//直接创建WebHostBuilder时候，也可以通过UseConfiguration方法，使用创建好的ConfigurationBuilder对象
+var config = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("config.json", optional: true, reloadOnChange: true)
+    .Build();
+
+var host = new WebHostBuilder()
+    .UseConfiguration(config)
+    .UseKestrel()
+    .UseStartup<Startup>();
+//后续可以通过依赖注入 使用IConfiguration
+```
+
+
+``` js
+//在普通控制台中直接创建ConfigurationBuilder，可以使用config对象
+var config = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", false, true)
+        .Build();
+
+//var redisconfig = config.GetSection("RedisConfig").Get<List<RedisConfig>>();
 
 ```
 
-#### **2.Except**
-* 使用默认（或者特定的）“相等比较器”生成两个序列的差集。即就是第一个序列中，去掉第二个序列中的元素。
-* 方法签名：
+### 二 读取配置文件的常用方法
+#### **1.GetSection**
+* `IConfiguration`的接口方法`GetSection`,使用“指定的子节键”提取配置子节。
+* 存在于`Microsoft.Extensions.Configuration.Abstractions`包中,通过nuget引用包`Microsoft.Extensions.Configuration`会引入最为其依赖。
+* 签名:`IConfigurationSection GetSection(string key);`这个方法永远不会返回null。如果没有找到与指定键匹配的子节，则为空的Microsoft.Extensions.Configuration.IConfigurationSection将被返回。
+* Sample:
 
 ``` js
 
-/// <summary>
-/// 使用默认相等比较器生成两个序列的差集。即就是第一个序列中，去掉第二个序列中的元素。
-/// </summary>
-/// <typeparam name="TSource">泛型类型参数</typeparam>
-/// <param name="first">第一个序列</param>
-/// <param name="second">第二个序列</param>
-/// <returns>返回集合R=A-B；即就是第一个序列中，去掉第二个序列中的元素。</returns>
-/// <exception cref="T:System.ArgumentNullException">first==null 或者 second==null</exception>
-IEnumerable<TSource> Except<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);
+static void Main(string[] args)
+{
+    Console.WriteLine("Hello World!");
 
-/// <summary>
-/// 使用特殊的相等比较器生成两个序列的差集。即就是第一个序列中，去掉第二个序列中的元素。
-/// 从一个集合中删除存在于另一个集合中的所有元素,并且第一个序列中去掉重复元素。
-/// </summary>
-/// <typeparam name="TSource">泛型类型参数</typeparam>
-/// <param name="first">第一个序列</param>
-/// <param name="second">第二个序列</param>
-/// <param name="comparer">相等比较器</param>
-/// <returns>通过特殊相等比较器，返回集合R=A-B；即就是第一个序列中，去掉第二个序列中的元素。</returns>
-/// <exception cref="T:System.ArgumentNullException">first==null 或者 second==null</exception>
-IEnumerable<TSource> Except<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer);
+    var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true)
+            .Build();
+    //Jerry
+    var getValue01 = config.GetValue<string>("Name");
+    //option2
+    var getvalue02 = config.GetValue<int>("option2");
+
+    //无法绑定复杂对象 null
+    var getvalue03 = config.GetValue<List<RedisConfig>>("RedisConfig");
+    var getvalue04 = config.GetValue<RedisConfig>("RedisConfig:0");
+    var getvalue05 = config.GetSection("RedisConfig").GetValue<RedisConfig>("0");
+    //127.0.0.1:6379,connectTimeout=3600
+    var getvalue06 = config.GetValue<string>("RedisConfig:0:Connection");
+    
+    Console.ReadKey();
+}
 
 ```
 
-#### **3.Intersect**
-* 使用默认的（或特定的）“相等比较器”生成两个序列的交集。即就是第一个序列与第二个序列都包含的元素。
-* 方法签名：
+#### **2.GetChildren**
+* `IConfiguration`的接口方法`GetChildren`,获取直接子代配置子节(`IEnumerable<IConfigurationSection>`)。
+* 存在于`Microsoft.Extensions.Configuration.Abstractions`包中,通过nuget引用包`Microsoft.Extensions.Configuration`会引入最为其依赖。
+* 签名:`IEnumerable<IConfigurationSection> GetChildren();`
+* Sample:
 
 ``` js
 
-/// <summary>
-/// 使用默认的相等比较器生成两个序列的交集。即就是第一个序列与第二个序列都包含的元素。
-/// </summary>
-/// <typeparam name="TSource">泛型类型参数</typeparam>
-/// <param name="first">第一个序列</param>
-/// <param name="second">第二个序列</param>
-/// <returns>包含构成两个序列的集合交集的元素的序列。</returns>
-/// <exception cref="T:System.ArgumentNullException">first==null 或者 second==null</exception>
-IEnumerable<TSource> Intersect<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);
+static void Main(string[] args)
+{
+    Console.WriteLine("Hello World!");
 
-/// <summary>
-/// 使用特殊的相等比较器生成两个序列的交集。即就是第一个序列与第二个序列都包含的元素。
-/// </summary>
-/// <typeparam name="TSource">泛型类型参数</typeparam>
-/// <param name="first">第一个序列</param>
-/// <param name="second">第二个序列</param>
-/// <param name="comparer">相等比较器</param>
-/// <returns>包含构成两个序列的集合交集的元素的序列。</returns>
-/// <exception cref="T:System.ArgumentNullException">first==null 或者 second==null</exception>
-IEnumerable<TSource> Intersect<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer);
+    var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true)
+            .Build();
+    //六个儿子节点
+    var children01 = config.GetChildren()?.ToList();
+    //一个儿子节点
+    var children02 = config.GetSection("RedisConfig").GetChildren()?.ToList();
+    //没有字节点，返回empty
+    var children03 = config.GetSection("Name").GetChildren()?.ToList();
+    //GetSection是empty ，返回empty
+    var children04 = config.GetSection("Name01").GetChildren()?.ToList();
+    
+
+    Console.ReadKey();
+}
 
 ```
 
-#### **4.Union**
-* 使用默认的（或特定的）“相等比较器”生成两个序列的并集。即就是组合两个集合并删除重复的元素。
-* 方法签名：
+#### **3.Exists**
+* `IConfigurationSection`的扩展方法`Exists`,作用确定节点是否存在。
+* 存在于`Microsoft.Extensions.Configuration.Abstractions`包中,通过nuget引用包`Microsoft.Extensions.Configuration`会引入最为其依赖。
+* 签名:`public static bool Exists(this IConfigurationSection section);`
+* Sample:
 
 ``` js
 
-/// <summary>
-/// 使用默认的相等比较器生成两个序列的集合并集。即就是组合两个集合并删除重复的元素。
-/// </summary>
-/// <typeparam name="TSource">序列的元素类型</typeparam>
-/// <param name="first">第一个序列</param>
-/// <param name="second">第二个序列</param>
-/// <returns>包含来自两个序列的元素，不包括重复项。</returns>
-/// <exception cref="T:System.ArgumentNullException">first==null or second==null</exception>
-IEnumerable<TSource> Union<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second);
+static void Main(string[] args)
+{
+    Console.WriteLine("Hello World!");
 
-/// <summary>
-/// 使用“特定的相等比较器”生成两个序列的集合并集。即就是组合两个集合并删除重复的元素。
-/// </summary>
-/// <typeparam name="TSource">序列的元素类型</typeparam>
-/// <param name="first">第一个序列</param>
-/// <param name="second">第二个序列</param>
-/// <param name="comparer"></param>
-/// <returns>包含来自两个序列的元素，不包括重复项。</returns>
-/// <exception cref="T:System.ArgumentNullException">first==null or second==null</exception>
-IEnumerable<TSource> Union<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer);
+    var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true)
+            .Build();
+
+    //true
+    var exist = config.GetSection("RedisConfig").Exists();
+    //true
+    var exist02 = config.GetSection("RedisConfig:0").Exists();
+    //false
+    var exist03 = config.GetSection("RedisConfig:1").Exists();
+}
 
 ```
+
+
+#### **4.GetValue**
+* `IConfiguration`的扩展方法`GetValue`,根据“指定键”从配置中提取一个值，并将其转换为指定类型。
+* 存在包`Microsoft.Extensions.Configuration.Binder`中。
+* 签名：
+
+``` js
+//有泛型方法，也有非泛型方法。
+
+public static T GetValue<T>(this IConfiguration configuration, string key);
+
+public static T GetValue<T>(this IConfiguration configuration, string key, T defaultValue);
+
+public static object GetValue(this IConfiguration configuration, Type type, string key);
+
+public static object GetValue(this IConfiguration configuration, Type type, string key, object defaultValue);
+
+```
+
+* Sample:
+
+``` js
+
+static void Main(string[] args)
+{
+    Console.WriteLine("Hello World!");
+
+    var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true)
+            .Build();
+
+    //2
+    var getvalue01 = config.GetValue<int>("option2");
+    //如果不存在对应的键，那么直接返回默认值
+    var getvalue02 = config.GetValue<int>("option00002");
+    //"127.0.0.1:6379,connectTimeout=3600"
+    var getvalue03 = config.GetSection("RedisConfig:0").GetValue<string>("Connection");
+
+    //键对应的值还包括其他键值，无法转换
+    var getvalue04 = config.GetValue<RedisConfig>("RedisConfig:0");
+    
+    Console.ReadKey();
+}
+
+
+```
+
+#### **5.Get、Bind**
+* `IConfiguration`的扩展方法`Get`、`Bind`,尝试将配置项中的值，绑定到对应的对象。
+* 存在包`Microsoft.Extensions.Configuration.Binder`中。
+* 签名：
+
+``` js
+
+public static void Bind(this IConfiguration configuration, string key, object instance);
+
+public static void Bind(this IConfiguration configuration, object instance);
+
+public static void Bind(this IConfiguration configuration, object instance, Action<BinderOptions> configureOptions);
+
+//Get有泛型与非泛型版本
+
+public static T Get<T>(this IConfiguration configuration);
+
+public static T Get<T>(this IConfiguration configuration, Action<BinderOptions> configureOptions);
+
+public static object Get(this IConfiguration configuration, Type type);
+
+public static object Get(this IConfiguration configuration, Type type, Action<BinderOptions> configureOptions);
+
+// 
+
+    public class BinderOptions
+{
+    public BinderOptions();
+
+    //如果为false(默认值)，绑定器将只尝试设置公共属性。如果为真，绑定器将尝试设置所有非只读属性。
+    public bool BindNonPublicProperties { get; set; }
+}
+
+```
+
+* Sample:
+
+``` js 
+
+static void Main(string[] args)
+{
+    Console.WriteLine("Hello World!");
+
+    var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true)
+            .Build();
+
+    //2
+    var get01 = config.GetSection("option2").Get<int>();
+    //可以绑定list
+    var get02 = config.GetSection("RedisConfig").Get<List<RedisConfig>>();
+    
+    //绑定为List<RedisConfig>
+    var bind01 = new List<RedisConfig>();
+    config.GetSection("RedisConfig").Bind(bind01);
+    //绑定为RedisConfig对象
+    var bind02 = new RedisConfig();
+    config.GetSection("RedisConfig:0").Bind(bind02);
+    //无法绑定单一值，与GetValue无法绑定复杂对象一样。这个方法可以绑定复杂对象
+    //但是无法绑定单一值
+    var bind03 = -1;
+    config.GetSection("RedisConfig:0:DefaultDatabase").Bind(bind03);
+    
+    
+    Console.ReadKey();
+}
+
+```
+
+
+
+
 
