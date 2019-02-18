@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  ".Net Core-配置文件"
-categories: ".Net Core"
+categories: .NetCore
 tags: ".Net Core" 配置文件
 author: GHMicoos
 ---
