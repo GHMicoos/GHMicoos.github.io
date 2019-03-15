@@ -9,6 +9,12 @@ type: page
 * content
 {:toc}
 
+## 开源项目
+
+*[Exceptionless](https://github.com/exceptionless/Exceptionless)
+     免费开源分布式系统日志收集框架
+     [.NET Core微服务之基于Exceptionless实现分布式日志记录](https://www.cnblogs.com/edisonchou/p/exceptionless_foundation_and_quick_start.html)    
+
 ## 工具
 
 * [box-shadow generator](http://www.cssmatic.com/box-shadow)
