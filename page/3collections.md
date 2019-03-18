@@ -20,7 +20,7 @@ type: page
 
 * [Ocelot](https://github.com/ThreeMammals/Ocelot)
 
-    [ocelot 自定义认证和授权](https://www.cnblogs.com/sheng-jie/p/9789180.html)
+    [ocelot 自定义认证和授权](https://www.cnblogs.com/weihanli/p/custom-authentication-authorization-in-ocelot.html)
 
     [Ocelot 配置初始](http://www.cnblogs.com/liyouming/p/8856722.html)
 
@@ -135,9 +135,9 @@ type: page
 
 ## .Net Core微服务
 
-* [【.NET Core微服务实战-统一身份认证】开篇及目录索引](https://www.cnblogs.com/edisonchou/p/exceptionless_foundation_and_quick_start.html)
+* [【.NET Core微服务实战-统一身份认证】开篇及目录索引](https://www.cnblogs.com/jackcao/p/9928879.html)
 
-    [Edison Zhou的微服务博客](https://www.cnblogs.com/edisonchou/category/1228401.html)
+* [Micro-Service Edison Zhou的微服务博客](https://www.cnblogs.com/edisonchou/category/1228401.html)
     包括Exceptionless,Steeltoe,Zipkin,HyStrix,Zuul,Eureka,App.Metreics,InfluxDB,Grafana,Mass Transit,Rest And RPC,RabbitMQ,Butterfly,Polly,Consul,Docker
 
 * [eShopOnContainers 知多少](https://www.cnblogs.com/sheng-jie/p/9789180.html)
