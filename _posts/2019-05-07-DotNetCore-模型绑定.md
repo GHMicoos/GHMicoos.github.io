@@ -1,0 +1,106 @@
+---
+layout: post
+title:  ".Net Core-模型绑定"
+categories: DotNetCore
+tags: .Net Core 模型绑定
+author: GHMicoos
+---
+
+
+* content
+{:toc}
+
+概述：.NET Core MVC/API 中的模型绑定将 HTTP 请求中的数据映射到操作方法参数。 这些参数可能是简单类型的参数，如字符串、整数或浮点数，也可能是复杂类型的参数。
+
+
+
+
+### 一 模型绑定的工作原理
+
+#### **1.绑定顺序**
+* 模型绑定使用参数名称和其公共可设置属性的名称查找每个参数的值。绑定来自请求各个部分的数据，并按一定顺序执行此操作。
+* `Form Values`:使用post的http请求的表单值。
+* `Route Values`:路由提供的路由值集。
+* `Query Values`:URI 的查询字符串部分。
+
+注意：窗体值、路由数据和查询字符串均存储为名称/值对。
+
+
+
+#### **2.默认值**
+
+* 默认模型绑定行为不成功，将根据参数的类型将参数设置为其默认值.
+
+* `T[]`： 除了`byte[]`类型数组外，绑定将`T[]`类型的参数设置为`Array.Empty<T>()`。`byte[]`类型的数组设置为`null`。
+* `引用类型`：绑定通过“默认的公共构造函数”创建类的属性而不设置属性。但是，模型绑定将`string`参数设置为`null`。
+* `可null值类型`：设置为`null`
+* `值类型`：设置为`default(T)`
+
+* 其他特殊类型
+
+* `IFormFile`、`IEnumerable<IFormFile>`：作为http请求的一部分——上传文件（一个或多个）。
+* `cancelationToken`：用于取消异步控制器中的活动
+
+* 对于绝大多数开发方案，默认模型绑定效果极佳。 它还可以扩展，因此如果你有特殊需求，则可自定义内置行为。
+
+
+#### **3.通过特性自定义模型绑定行为**
+
+* 包含多种特性，可用于将其默认模型绑定行为定向到不同的源。
+
+* `BindRequired`:如果无法发生绑定，此特性将添加模型状态错误。
+* `BindNever`:指示模型绑定器从不绑定到此参数。
+* `FromHeader`、`FromQuery`、`FromRoute`、`FromForm`:使用这些特性指定要应用的确切绑定源。
+* `FromServices`:此特性使用依赖关系注入绑定服务中的参数。
+* `FromBody`:使用配置的格式化程序绑定请求正文中的数据。 基于请求的内容类型，选择格式化程序。
+* `ModelBinder`:用于替代默认模型绑定器、绑定源和名称。
+
+
+#### **4.全局自定义模型绑定和验证**
+
+由 `ModelMetadata`驱动模型绑定和验证系统的行为，该行为描述：
+* 如何绑定模型。
+* 如何验证类型及其属性。
+
+* 若要禁用对特定类型的所有模型的模型绑定,在 `Startup.ConfigureServices`中添加`SuppressChildValidationMetadataProvider`:
+ 
+ ``` js
+ 
+//禁用对 System.Version 类型的所有模型的模型绑定
+services.AddMvc().AddMvcOptions(options =>
+    options.ModelMetadataDetailsProviders.Add(
+        new SuppressChildValidationMetadataProvider(typeof(System.Guid))));
+
+ ```
+
+* 要禁用对特定类型的属性的验证，请在`Startup.ConfigureServices` 中添加 `SuppressChildValidationMetadataProvider`。
+
+``` js
+//禁用对 System.Guid 类型的属性的验证
+services.AddMvc().AddMvcOptions(options =>
+    options.ModelMetadataDetailsProviders.Add(
+        new SuppressChildValidationMetadataProvider(typeof(System.Guid))));
+
+```
+
+#### **4.全局自定义模型绑定和验证**
+
+请求数据可以有各种格式，包括 JSON、XML 和许多其他格式。 使用 `[FromBody]` 特性指示要将参数绑定到请求正文中的数据时，MVC 会使用一组已配置的格式化程序基于请求数据的内容类型对请求数据进行处理。 默认情况下，MVC 包括用于处理 JSON 数据的 `JsonInputFormatter` 类，但你可以添加用于处理 XML 和其他自定义格式的其他格式化程序。
+
+注：对于用 `[FromBody]` 修饰的每个操作，最多可以有一个参数。 ASP.NET Core MVC 运行时向格式化程序委托读取请求流的责任。 读取参数的请求流后，通常不能为绑定其他 `[FromBody]` 参数而再次读取请求流。
+
+注：`JsonInputFormatter` 为默认格式化程序且基于 Json.NET。
+
+* 添加 支持XML请求数据格式
+
+除非有特性应用于 ASP.NET Core，否则它将基于 Content-Type 标头和参数类型来选择输入格式化程序。 如果想要使用 XML 或其他格式，则必须在 `Startup.cs` 文件中配置该格式，但可能必须先使用 NuGet 获取对 `Microsoft.AspNetCore.Mvc.Formatters.Xml` 的引用。 启动代码应如下所示：
+
+``` js
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMvc()
+        .AddXmlSerializerFormatters();
+}
+
+```
