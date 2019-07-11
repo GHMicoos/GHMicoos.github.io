@@ -10,20 +10,19 @@ author: GHMicoos
 * content
 {:toc}
 
-概述：.NET Core MVC/API 中的模型绑定将 HTTP 请求中的数据映射到操作方法参数。 这些参数可能是简单类型的参数，如字符串、整数或浮点数，也可能是复杂类型的参数。
+概述：模型状态表示两个子系统的错误：模型绑定和模型验证。 模型绑定的错误通常是数据转换错误。 模型验证在模型绑定之后进行，并在数据不符合业务规则时报告错误。
 
 
 
 
-### 一 模型绑定的工作原理
+### 一 模型状态ModelState
 
-#### **1.绑定顺序**
-* 模型绑定使用参数名称和其公共可设置属性的名称查找每个参数的值。绑定来自请求各个部分的数据，并按一定顺序执行此操作。
-* `Form Values`:使用post的http请求的表单值。
-* `Route Values`:路由提供的路由值集。
-* `Query Values`:URI 的查询字符串部分。
 
-注意：窗体值、路由数据和查询字符串均存储为名称/值对。
+#### **1.什么是模型状态**
+* ModelState的位置
+![ModelState](https://github.com/GHMicoos/GHMicoos.github.io/blob/master/images/blog/DotNetCore%E6%A8%A1%E5%9E%8B%E9%AA%8C%E8%AF%81/ModelState_Place.jpg "位置")
+
+
 
 
 
