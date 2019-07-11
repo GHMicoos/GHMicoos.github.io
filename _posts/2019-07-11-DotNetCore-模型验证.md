@@ -20,7 +20,7 @@ author: GHMicoos
 
 #### **1.什么是模型状态**
 * ModelState的位置
-![ModelState](https://github.com/GHMicoos/GHMicoos.github.io/blob/master/images/blog/DotNetCore%E6%A8%A1%E5%9E%8B%E9%AA%8C%E8%AF%81/ModelState_Place.jpg "位置")
+![ModelState](https://raw.githubusercontent.com/GHMicoos/GHMicoos.github.io/master/images/blog/DotNetCore%E6%A8%A1%E5%9E%8B%E9%AA%8C%E8%AF%81/ModelState_Place.jpg "位置")
 
 
 
