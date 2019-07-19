@@ -10,7 +10,7 @@ author: GHMicoos
 * content
 {:toc}
 
-概述：模型状态表示两个子系统的错误：模型绑定和模型验证。 模型绑定的错误通常是数据转换错误。 模型验证在模型绑定之后进行，并在数据不符合业务规则时报告错误。
+[概述](https://docs.microsoft.com/zh-cn/aspnet/core/mvc/models/validation?view=aspnetcore-2.2#custom-attributes)：模型状态表示两个子系统的错误：模型绑定和模型验证。 模型绑定的错误通常是数据转换错误。 模型验证在模型绑定之后进行，并在数据不符合业务规则时报告错误。
 
 
 
@@ -21,85 +21,44 @@ author: GHMicoos
 #### **1.什么是模型状态**
 * ModelState的位置
 ![ModelState](https://raw.githubusercontent.com/GHMicoos/GHMicoos.github.io/master/images/blog/DotNetCore%E6%A8%A1%E5%9E%8B%E9%AA%8C%E8%AF%81/ModelState_Place.jpg "位置")
-
-
-
-
-
-#### **2.默认值**
-
-* 默认模型绑定行为不成功，将根据参数的类型将参数设置为其默认值.
-
-* `T[]`： 除了`byte[]`类型数组外，绑定将`T[]`类型的参数设置为`Array.Empty<T>()`。`byte[]`类型的数组设置为`null`。
-* `引用类型`：绑定通过“默认的公共构造函数”创建类的属性而不设置属性。但是，模型绑定将`string`参数设置为`null`。
-* `可null值类型`：设置为`null`
-* `值类型`：设置为`default(T)`
-
-* 其他特殊类型
-
-* `IFormFile`、`IEnumerable<IFormFile>`：作为http请求的一部分——上传文件（一个或多个）。
-* `cancelationToken`：用于取消异步控制器中的活动
-
-* 对于绝大多数开发方案，默认模型绑定效果极佳。 它还可以扩展，因此如果你有特殊需求，则可自定义内置行为。
-
-
-#### **3.通过特性自定义模型绑定行为**
-
-* 包含多种特性，可用于将其默认模型绑定行为定向到不同的源。
-
-* `BindRequired`:如果无法发生绑定，此特性将添加模型状态错误。
-* `BindNever`:指示模型绑定器从不绑定到此参数。
-* `FromHeader`、`FromQuery`、`FromRoute`、`FromForm`:使用这些特性指定要应用的确切绑定源。
-* `FromServices`:此特性使用依赖关系注入绑定服务中的参数。
-* `FromBody`:使用配置的格式化程序绑定请求正文中的数据。 基于请求的内容类型，选择格式化程序。
-* `ModelBinder`:用于替代默认模型绑定器、绑定源和名称。
-
-
-#### **4.全局自定义模型绑定和验证**
-
-由 `ModelMetadata`驱动模型绑定和验证系统的行为，该行为描述：
-* 如何绑定模型。
-* 如何验证类型及其属性。
-
-* 若要禁用对特定类型的所有模型的模型绑定,在 `Startup.ConfigureServices`中添加`SuppressChildValidationMetadataProvider`:
- 
- ``` js
- 
-//禁用对 System.Version 类型的所有模型的模型绑定
-services.AddMvc().AddMvcOptions(options =>
-    options.ModelMetadataDetailsProviders.Add(
-        new SuppressChildValidationMetadataProvider(typeof(System.Guid))));
-
- ```
-
-* 要禁用对特定类型的属性的验证，请在`Startup.ConfigureServices` 中添加 `SuppressChildValidationMetadataProvider`。
-
+* ModelState.IsValid 表示`模型绑定`、`模型验证`是否都是都成功。模型绑定的错误通常是数据转换错误。模型验证的错误通常是数据不符合业务规则。
+* 如何获取模型绑定和模型验证的错误消息
 ``` js
-//禁用对 System.Guid 类型的属性的验证
-services.AddMvc().AddMvcOptions(options =>
-    options.ModelMetadataDetailsProviders.Add(
-        new SuppressChildValidationMetadataProvider(typeof(System.Guid))));
-
+ foreach (var item in ModelState.Values)//一个Model可能有多个字段
+ {
+     foreach (var jitem in item.Errors)//一个字段可能有多个错误
+     {
+         jitem.ErrorMessage;//string
+     }
+ }
 ```
 
-#### **4.全局自定义模型绑定和验证**
+#### **2.Web与Web Api 的模型验证**
+* 模型绑定和验证都在执行控制器操作或 Razor Pages 处理程序方法之前进行。 Web 应用负责检查 ModelState.IsValid 并做出相应响应。 Web 应用通常会重新显示带有错误消息的页面：
+* 如果 Web API 控制器具有 `[ApiController]` 特性，则它们不必检查 `ModelState.IsValid`，在此情况下，如果模型状态无效，将返回包含问题详细信息的自动 HTTP 400 响应。
 
-请求数据可以有各种格式，包括 JSON、XML 和许多其他格式。 使用 `[FromBody]` 特性指示要将参数绑定到请求正文中的数据时，MVC 会使用一组已配置的格式化程序基于请求数据的内容类型对请求数据进行处理。 默认情况下，MVC 包括用于处理 JSON 数据的 `JsonInputFormatter` 类，但你可以添加用于处理 XML 和其他自定义格式的其他格式化程序。
+#### **3.重新运行模型验证**
+* 验证自动进行，但是可能需要手动进行重复验证。 例如，你可能为属性计算一个值，并且希望将属性设置为所计算的值后，再重新运行验证。 
+* 使用代码 `TryValidateModel(model)`
 
-注：对于用 `[FromBody]` 修饰的每个操作，最多可以有一个参数。 ASP.NET Core MVC 运行时向格式化程序委托读取请求流的责任。 读取参数的请求流后，通常不能为绑定其他 `[FromBody]` 参数而再次读取请求流。
 
-注：`JsonInputFormatter` 为默认格式化程序且基于 Json.NET。
+### 二 模型验证
 
-* 添加 支持XML请求数据格式
+#### **1.验证特性**
+* 通过验证特性可以为模型属性指定验证规则。包括：内置特性、自定义特性。
 
-除非有特性应用于 ASP.NET Core，否则它将基于 Content-Type 标头和参数类型来选择输入格式化程序。 如果想要使用 XML 或其他格式，则必须在 `Startup.cs` 文件中配置该格式，但可能必须先使用 NuGet 获取对 `Microsoft.AspNetCore.Mvc.Formatters.Xml` 的引用。 启动代码应如下所示：
+#### **2.内置特性**
+* `[CreditCard]`：验证属性是否有信用卡格式。
+* `[Compare]`：验证模型中的两个属性是否匹配。
+* `[EmailAddress]`：验证属性是否有电子邮件格式。
+* `[Phone]`：验证属性是否有电话号码格式。
+* `[Range]`：验证属性值是否在指定范围内。
+* `[RegularExpression]`：验证属性值是否与指定的正则表达式匹配。
+* `[Required]`：验证字段是否非 NULL。 请参阅 [必需] 特性，获取关于该特性的行为的详细信息。
+* `[StringLength]`：验证字符串属性值是否未超过指定长度限制。
+* `[Url]`：验证属性是否有 URL 格式。
+* `[Remote]`：通过调用服务器上的操作方法，验证客户端上的输入。 请参阅 [远程] 特性获取关于该特性的行为的详细信息。
 
-``` js
+* 在 [`System.ComponentModel.DataAnnotations`](https://docs.microsoft.com/zh-cn/dotnet/api/system.componentmodel.dataannotations?view=netframework-4.8) 命名空间中可找到验证特性的完整列表
 
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddMvc()
-        .AddXmlSerializerFormatters();
-}
-
-```
+* 错误消息：`[StringLength(8, ErrorMessage = "Name length can't be more than 8.")]`
