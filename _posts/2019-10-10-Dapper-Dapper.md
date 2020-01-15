@@ -1,0 +1,179 @@
+---
+layout: post
+title:  "ORM Dapper"
+categories: ORM
+tags: ORM Dapper
+author: GHMicoos
+---
+
+
+* content
+{:toc}
+
+**Dapper**是.NET的简单对象映射器，在速度方面拥有微型ORM之王的标题，几乎与使用原始ADO.NET数据读取器一样快。 ORM是一个对象关系映射器，负责数据库和编程语言之间的映射。
+
+``` js
+
+class Person
+{
+    public Guid Id { get; set; }
+
+    public string Name { get; set; }
+
+    public string Mobile { get; set; }
+}
+
+
+```
+
+包括的主要方法是：
+`Execute`
+    `Stored Procedure`
+
+``` js unfinished
+
+//sql
+/*
+CREATE PROCEDURE Pro_GetPerson
+(
+	@Name nvarchar(100),
+	@Count int output
+)
+AS
+BEGIN
+	select * from Person where Name=(case @Name when null then Name else @Name end)
+
+	set @Count=100
+	return 1000
+END
+*/
+
+using (var connection = new SqlConnection(SQL_CONNECTION_STRING))
+{
+    var param = new DynamicParameters();
+    //存储过程 input参数
+    param.Add("@Name","张四");
+    //output参数
+    param.Add("@Count",dbType:DbType.Int32,direction:ParameterDirection.Output);
+    //存储过程中return的结果
+    param.Add("@Return", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+    //
+    var person = connection.Query<Person>("Pro_GetPerson", param, commandType: CommandType.StoredProcedure);
+    var count = param.Get<int>("@Count");
+    var result = param.Get<int>("@Return");
+}
+
+
+
+```
+
+    `Insert`
+
+
+``` js
+//单条插入
+using (var conn = new SqlConnection(SQL_CONNECTION_STRING)) 
+{
+    var sql = "insert into Person values(@Id,@Name,@Mobile)";
+    ///插入单个
+    //使用匿名类型对象
+    var affectedRows = conn.Execute(sql, new { Id = Guid.NewGuid(), Name = "张三", Mobile = "18684574414" });
+    var person = new Person()
+    {
+        Id=Guid.NewGuid(),
+        Name="李四",
+        Mobile="18452451121",
+    };
+    //使用强类型对象（其实person，隐式转换为匿名对象）
+    affectedRows = conn.Execute(sql,person);
+
+    ///插入多个
+    var personList = new List<Person>()
+    {
+        new Person()
+        {
+            Id = Guid.NewGuid(),
+            Name = "李四",
+            Mobile = "18452451121",
+        },
+        new Person()
+        {
+            Id = Guid.NewGuid(),
+            Name = "李四",
+            Mobile = "18452451121",
+        },
+    };
+    
+    affectedRows = conn.Execute(sql, personList);
+}
+
+```
+
+    `Update`
+
+``` js
+//更新单条
+using (var conn = new SqlConnection(SQL_CONNECTION_STRING))
+{
+    var sql = "update Person set Name=@Name where Id=@id";
+
+    ///更新单条
+    //匿名类型
+    var affectedRows = conn.Execute(sql, new { Id = "11BD05FD-AF43-447D-906C-27BC20180EC4", Name = "张三", Mobile = "18684574414" });
+    //强类型参数，隐式转换为匿名类型
+    var person = new Person()
+    {
+        Id = Guid.Parse("11BD05FD-AF43-447D-906C-27BC20180EC4"),
+        Name = "张四",
+        Mobile = "18452451121",
+    };
+    affectedRows = conn.Execute(sql, person);
+
+    ///更新多条
+    //匿名类型
+    affectedRows = conn.Execute(sql, new[] { 
+        new { Name = "张三", Mobile = "11111111111" }, 
+        new { Name = "张四", Mobile = "11111111111" }, });
+    //强类型参数，隐式转换为匿名类型
+    var personList = new List<Person>()
+    {
+        new Person(){ Name = "张三", Mobile = "11111111111" },
+        new Person(){ Name = "张四", Mobile = "11111111111" },
+    };
+    affectedRows = conn.Execute(sql, personList);
+}
+
+```
+
+    `Delete`
+
+``` js
+
+using (var conn = new SqlConnection(SQL_CONNECTION_STRING))
+{
+    var sql = "delete Person  where Name=@Name";
+    ///删除单个
+    //匿名类型
+    var affectedRows = conn.Execute(sql, new {Name = "张三"});
+    //强类型参数，隐式转换为匿名类型
+    var person = new Person()
+    {
+        Name = "张四",
+    };
+    affectedRows = conn.Execute(sql, person);
+
+    ///删除多个
+    var personList = new List<Person>()
+    { 
+        new Person(){ Name="张三"},
+        new Person(){ Name="张四"},
+    };
+    affectedRows = conn.Execute(sql, person);
+}
+
+```
+
+`Query`
+
+
+

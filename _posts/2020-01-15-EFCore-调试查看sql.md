@@ -1,0 +1,105 @@
+---
+layout: post
+title:  "EFCore SQL"
+categories: EFCore
+tags: EFCore SQL
+author: GHMicoos
+---
+
+
+* content
+{:toc}
+
+EF Core 没有直接提供像 EF6 那样方便的在日志中记录最终生成的 SQL 的功能，可以通过官方提供的日志记录(Microsoft.Extensions.Logging)实现.
+
+
+
+### 零 日志提供程序
+
+
+#### **0.EF Core 日志记录当前需要一个本身配置有一个或多个ILoggerProvider的ILoggerFactory。以下包中是常见的提供程序：**
+* `Microsoft.Extensions.Logging.Console`：一个简单的控制台记录器。
+* `Microsoft.Extensions.Logging.AzureAppServices`：支持Azure应用服务诊断日志和日志流功能。
+* `Microsoft.Extensions.Logging.Debug`：使用`System.Diagnostics.Debug.WriteLine()`调试器监视日志。
+* `Microsoft.Extensions.Logging.EventLog`：记录到WIndows事件日志。
+* `Microsoft.Extensions.Logging.EventSource`支持`EventSource/EventListener`。
+* `Microsoft.Extensions.Logging.TraceSource`：会向使用`System.Diagnostics.TraceSource.TraceEvent()`的跟踪侦听器。
+
+
+
+### 一 使用 `ILoggerProvider` 查看生成的SQL语句
+
+#### *** 0.添加包` Microsoft.Extensions.Logging.Debug`*
+
+#### *** 1.DbContext文件,添加引用*
+
+``` sql
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Debug;
+
+```
+
+
+#### *** 2.DbContext文件里定义一个日志工厂*
+
+``` sql
+ // Microsoft.Extensions.Logging.Debug
+ public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] {
+            new DebugLoggerProvider()
+        });
+
+ //Microsoft.Extensions.Logging.Console 
+ public static readonly LoggerFactory MyLoggerFactory = new LoggerFactory(new[] {
+            new ConsoleLoggerProvider((category, level)  => category == DbLoggerCategory.Database.Command.Name&& level == LogLevel.Information, true)
+        });
+
+```
+
+#### *** 3.在DbContext文件OnConfiguring连接字符前添加日志UseLoggerFactory(MyLoggerFactory)*
+
+``` sql
+
+ protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseLoggerFactory(MyLoggerFactory).UseMySql("Server=xxx;User Id=xxx;Password=xxx;Database=bebefocus;Persist Security Info=True;");
+                // optionsBuilder.UseLoggerFactory(MyLoggerFactory).UseSqlServer("Server=xxx;User Id=xxx;Password=xxx;Database=bebefocus;Persist Security Info=True;");
+            }
+        }
+
+```
+
+#### *** 4.运行查看 在输出面板里查看(菜单：视图->输出)*
+
+
+``` sql
+
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executing DbCommand [Parameters=[@__param_AssessObjectType_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='150000']
+SELECT COUNT(*)
+FROM [ChildTemp] AS [c]
+WHERE (([c].[AssessObjectType] = @__param_AssessObjectType_0) AND ([c].[AssessObjectType] IS NOT NULL AND @__param_AssessObjectType_0 IS NOT NULL)) OR ([c].[AssessObjectType] IS NULL AND @__param_AssessObjectType_0 IS NULL)
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executing DbCommand [Parameters=[@__param_AssessObjectType_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='150000']
+SELECT [c].[ChildTempID], [c].[AssessLevelProportion], [c].[AssessName], [c].[AssessObjectType], [c].[AssessObjectValue], [c].[AssessWeightMustFull], [c].[CreateTime], [c].[Creator], [c].[IsSubmitSummary], [c].[Modifier], [c].[ModifyTime], [c].[Remark], [c].[TempLevel], [c].[TempName], [c].[TempType], [c0].[ChildTempAeesesedObjectID], [c0].[ChildTempID], [c0].[CreateTime], [c0].[Creator], [c0].[Name], [c0].[ObjectType], [c0].[ObjectValue], [c1].[ChildTempAssessItemID], [c1].[BasicIndicator], [c1].[ChallengeIndicator], [c1].[ChildTempID], [c1].[CreateTime], [c1].[Creator], [c1].[Explain], [c1].[Modifier], [c1].[ModifyTime], [c1].[ShowIndex], [c1].[Title], [c1].[Weight]
+FROM [ChildTemp] AS [c]
+LEFT JOIN [ChildTempAssessedObject] AS [c0] ON [c].[ChildTempID] = [c0].[ChildTempID]
+LEFT JOIN [ChildTempAssessItem] AS [c1] ON [c].[ChildTempID] = [c1].[ChildTempID]
+WHERE (([c].[AssessObjectType] = @__param_AssessObjectType_0) AND ([c].[AssessObjectType] IS NOT NULL AND @__param_AssessObjectType_0 IS NOT NULL)) OR ([c].[AssessObjectType] IS NULL AND @__param_AssessObjectType_0 IS NULL)
+ORDER BY [c].[CreateTime] DESC, [c].[ChildTempID], [c0].[ChildTempAeesesedObjectID], [c1].[ChildTempAssessItemID]
+
+```
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
