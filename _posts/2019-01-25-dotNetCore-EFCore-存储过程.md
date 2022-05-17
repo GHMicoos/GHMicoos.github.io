@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  ".Net Core-存储过程(SQL Server)"
-categories: .Net Core
-tags: .Net Core EFCore 存储过程 
+categories: dotNetCore
+tags: dotNetCore EFCore 存储过程 
 author: GHMicoos
 ---
 

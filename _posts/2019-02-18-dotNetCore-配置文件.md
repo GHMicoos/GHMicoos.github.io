@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  ".Net Core-配置文件"
-categories: DotNetCore
-tags: .Net Core 配置文件
+title:  "dotNetCore-配置文件"
+categories: dotNetCore
+tags: dotNetCore 配置文件
 author: GHMicoos
 ---
 

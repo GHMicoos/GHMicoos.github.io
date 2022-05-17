@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  ".Net Core-自定义模型绑定"
-categories: DotNetCore
-tags: .Net Core 自定义模型绑定
+title:  "dotNetCore-自定义模型绑定"
+categories: dotNetCore
+tags: dotNetCore 自定义模型绑定
 author: GHMicoos
 ---
 
