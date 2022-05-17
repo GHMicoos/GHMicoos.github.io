@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Lambda-Partitioning"
-categories: C#基础-LinqToObject
+categories: C#-LinqToObject
 tags: Enumerable Lambda LinqToObject
 author: GHMicoos
 ---
