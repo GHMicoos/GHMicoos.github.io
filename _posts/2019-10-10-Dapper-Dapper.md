@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ORM Dapper"
+title:  "Dapper"
 categories: ORM
 tags: ORM Dapper
 author: GHMicoos
@@ -11,6 +11,9 @@ author: GHMicoos
 {:toc}
 
 `Dapper`是.NET的简单对象映射器，在速度方面拥有微型ORM之王的标题，几乎与使用原始ADO.NET数据读取器一样快。 ORM是一个对象关系映射器，负责数据库和编程语言之间的映射。
+
+
+### 零 操作
 
 ``` js
 
