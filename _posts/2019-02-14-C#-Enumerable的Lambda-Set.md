@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`Distinct`,`Except`,`Intersect`,`Union`。
+概述：包括`Distinct`,`Except`,`Intersect`,`Union`。
 
 
 

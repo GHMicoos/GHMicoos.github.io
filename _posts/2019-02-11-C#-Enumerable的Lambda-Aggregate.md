@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`Aggregate`,`Count`,`LongCount`,`Sum`,`Average`,`Max`,`Min`。
+概述：包括`Aggregate`,`Count`,`LongCount`,`Sum`,`Average`,`Max`,`Min`。
 
 
 

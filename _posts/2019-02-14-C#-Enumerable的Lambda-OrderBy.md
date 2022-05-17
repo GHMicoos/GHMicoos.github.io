@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`OrderBy`,`OrderByDescending`,`ThenBy`,`ThenByDescending`，`Reverse`。
+概述：包括`OrderBy`,`OrderByDescending`,`ThenBy`,`ThenByDescending`，`Reverse`。
 
 
 

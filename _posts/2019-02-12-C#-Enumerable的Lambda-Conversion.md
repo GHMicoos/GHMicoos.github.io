@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`AsEnumerable`、`Cast`、`OfType`、`ToArray`、`ToList`、`ToDictionary`、`ToLookup`。
+概述：包括`AsEnumerable`、`Cast`、`OfType`、`ToArray`、`ToList`、`ToDictionary`、`ToLookup`。
 
 
 

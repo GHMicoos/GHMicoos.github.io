@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`DefaultIfEmpty`,`Empty`,`Range`,`Repeat`。
+概述：包括`DefaultIfEmpty`,`Empty`,`Range`,`Repeat`。
 
 
 

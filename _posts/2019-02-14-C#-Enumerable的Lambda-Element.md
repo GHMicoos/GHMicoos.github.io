@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`ElementAt`,`ElementAtOrDefault`,`First`,`FirstOrDefault`,`Last`,`LastOrDefault`,`Single`,`SingleOrDefault`。
+概述：包括`ElementAt`,`ElementAtOrDefault`,`First`,`FirstOrDefault`,`Last`,`LastOrDefault`,`Single`,`SingleOrDefault`。
 
 
 

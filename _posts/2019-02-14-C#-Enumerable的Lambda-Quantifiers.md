@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`All`,`Any`,`Contains`。
+概述：包括`All`,`Any`,`Contains`。
 
 
 
