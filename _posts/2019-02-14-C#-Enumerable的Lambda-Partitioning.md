@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Lambda-Partitioning"
-categories: C#基础-LinqToObject
+categories: C#-LinqToObject
 tags: Enumerable Lambda LinqToObject
 author: GHMicoos
 ---
@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`Concat`,`SequenceEqual`,`Zip`,`Append`。
+概述：包括`Concat`,`SequenceEqual`,`Zip`,`Append`。
 
 
 

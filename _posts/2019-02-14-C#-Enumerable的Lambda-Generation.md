@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Lambda-Generation"
-categories: C#基础-LinqToObject
+categories: C#-LinqToObject
 tags: Enumerable Lambda LinqToObject
 author: GHMicoos
 ---
@@ -9,7 +9,7 @@ author: GHMicoos
 * content
 {:toc}
 
-包括：`DefaultIfEmpty`,`Empty`,`Range`,`Repeat`。
+概述：包括`DefaultIfEmpty`,`Empty`,`Range`,`Repeat`。
 
 
 
